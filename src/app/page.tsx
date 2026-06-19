@@ -14,7 +14,15 @@ type RecentReview = {
   verdict: "GO" | "REVISE" | "KILL";
   overall: number;
   created_at: string;
+  image: string;
 };
+
+// Use the ad's own image when present; otherwise a stable random stock photo
+// (seeded by the review id, so it stays the same on every render).
+function imageFor(id: string, uploaded?: string): string {
+  if (uploaded && uploaded.trim()) return uploaded;
+  return `https://picsum.photos/seed/${encodeURIComponent(id)}/400/300`;
+}
 
 // Real verdicts issued by the agent team, newest first. Falls back to a small
 // curated set so the landing page never renders empty during a demo.
@@ -38,6 +46,7 @@ async function getRecentReviews(): Promise<{ items: RecentReview[]; live: boolea
         verdict: r.verdict,
         overall: r.overall ?? 0,
         created_at: r.created_at,
+        image: imageFor(r.id, r.input?.creative?.imageUrl),
       }));
     if (!items.length) throw new Error("no verdicts");
     return { items, live: true };
@@ -47,10 +56,10 @@ async function getRecentReviews(): Promise<{ items: RecentReview[]; live: boolea
 }
 
 const FALLBACK_REVIEWS: RecentReview[] = [
-  { id: "s1", headline: "Lose 10kg in 2 weeks — guaranteed!", objective: "Conversions", audience: "Women 30–45, EU", verdict: "REVISE", overall: 4.8, created_at: new Date().toISOString() },
-  { id: "s2", headline: "The 5-minute morning routine top founders swear by", objective: "Awareness", audience: "Founders, US", verdict: "GO", overall: 8.2, created_at: new Date().toISOString() },
-  { id: "s3", headline: "Cure your anxiety — doctors hate this one trick", objective: "Conversions", audience: "Adults 25–50", verdict: "KILL", overall: 2.6, created_at: new Date().toISOString() },
-  { id: "s4", headline: "Your team’s busywork, automated by Friday", objective: "Leads", audience: "Ops managers, B2B", verdict: "GO", overall: 7.6, created_at: new Date().toISOString() },
+  { id: "s1", headline: "Lose 10kg in 2 weeks — guaranteed!", objective: "Conversions", audience: "Women 30–45, EU", verdict: "REVISE", overall: 4.8, created_at: new Date().toISOString(), image: imageFor("s1") },
+  { id: "s2", headline: "The 5-minute morning routine top founders swear by", objective: "Awareness", audience: "Founders, US", verdict: "GO", overall: 8.2, created_at: new Date().toISOString(), image: imageFor("s2") },
+  { id: "s3", headline: "Cure your anxiety — doctors hate this one trick", objective: "Conversions", audience: "Adults 25–50", verdict: "KILL", overall: 2.6, created_at: new Date().toISOString(), image: imageFor("s3") },
+  { id: "s4", headline: "Your team’s busywork, automated by Friday", objective: "Leads", audience: "Ops managers, B2B", verdict: "GO", overall: 7.6, created_at: new Date().toISOString(), image: imageFor("s4") },
 ];
 
 function timeAgo(iso: string): string {
@@ -190,8 +199,12 @@ export default async function Landing() {
           <div className="verdict-grid">
             {recent.map((r) => (
               <div className="verdict-card" key={r.id}>
+                <div className="vc-media">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={r.image} alt="" loading="lazy" />
+                  <span className={`dot-badge dot-${r.verdict} vc-media-badge`}>{r.verdict}</span>
+                </div>
                 <div className="verdict-card-head">
-                  <span className={`dot-badge dot-${r.verdict}`}>{r.verdict}</span>
                   <span className="vc-time">{timeAgo(r.created_at)}</span>
                 </div>
                 <p className="vc-headline">“{r.headline}”</p>
