@@ -8,9 +8,10 @@ import { createService } from "@/lib/supabase/service";
 const SAMPLE_INPUTS: ReviewInput[] = [
   {
     creative: { 
-      headline: "Just Do It — Nike Air Max 90 Now Available", 
+      headline: "Just Do It — Nike Air Max 90 Now Available",
       body: "Experience legendary comfort and style. Limited stock.",
-      cta: "Shop Now" 
+      cta: "Shop Now",
+      imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
     },
     brief: { objective: "Drive sales", audience: "Athletes 18-35", offer: "$20 off first order", brandVoice: "Motivational" },
   },

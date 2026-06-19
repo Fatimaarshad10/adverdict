@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 type ReviewRecord = {
   id: string;
   input: {
-    creative: { headline: string; body: string; cta: string };
+    creative: { headline: string; body: string; cta: string; imageUrl?: string };
     brief: { objective: string; audience?: string };
   };
   result: any;
@@ -17,6 +17,13 @@ type ReviewRecord = {
   overall: number | null;
   created_at: string;
 };
+
+// Use the ad's own image when present; otherwise a stable random stock photo
+// (seeded by the review id, so it stays the same on every render).
+function imageFor(id: string, uploaded?: string): string {
+  if (uploaded && uploaded.trim()) return uploaded;
+  return `https://picsum.photos/seed/${encodeURIComponent(id)}/400/300`;
+}
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -102,8 +109,12 @@ export default function ReviewsPage() {
           <div className="verdict-grid">
             {reviews.map((r) => (
               <div className="verdict-card" key={r.id}>
+                <div className="vc-media">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imageFor(r.id, r.input?.creative?.imageUrl)} alt="" loading="lazy" />
+                  <span className={`dot-badge dot-${r.verdict ?? "REVISE"} vc-media-badge`}>{r.verdict ?? "ERR"}</span>
+                </div>
                 <div className="verdict-card-head">
-                  <span className={`dot-badge dot-${r.verdict ?? "REVISE"}`}>{r.verdict ?? "ERR"}</span>
                   <span className="vc-time">{timeAgo(r.created_at)}</span>
                 </div>
                 <p className="vc-headline">“{r.input?.creative?.headline ?? "Untitled creative"}”</p>
