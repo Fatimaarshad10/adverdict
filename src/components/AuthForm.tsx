@@ -26,10 +26,11 @@ export default function AuthForm({ mode }: { mode: "signin" | "signup" }) {
     setNotice(null);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp(
-          { email, password },
-          { redirectTo: `${window.location.origin}/auth/callback` }
-        );
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        });
         if (error) throw error;
         setNotice("Check your email to confirm your account, then sign in.");
       } else {
