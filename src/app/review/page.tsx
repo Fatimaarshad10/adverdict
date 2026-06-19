@@ -4,23 +4,23 @@ import { useState } from "react";
 import Nav from "@/components/Nav";
 import type { ReviewResult } from "@/lib/types";
 
-const SAMPLE = {
+const EMPTY = {
   creative: {
-    headline: "Lose 10kg in 2 weeks — guaranteed!",
-    body: "Our clinically proven supplement melts fat fast. Thousands of happy customers.",
-    cta: "Buy now",
+    headline: "",
+    body: "",
+    cta: "",
     imageUrl: "",
   },
   brief: {
-    objective: "Conversions",
-    audience: "Women 30–45, health-conscious, EU",
-    offer: "20% off first order",
-    brandVoice: "Warm, science-backed, no hype",
+    objective: "",
+    audience: "",
+    offer: "",
+    brandVoice: "",
   },
 };
 
 export default function ReviewPage() {
-  const [form, setForm] = useState(SAMPLE);
+  const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,26 @@ export default function ReviewPage() {
     }
   }
 
+  function validate(): string | null {
+    const c = form.creative;
+    const b = form.brief;
+    if (!c.headline.trim()) return "Add a headline.";
+    if (!c.body.trim()) return "Add body copy.";
+    if (!c.cta.trim()) return "Add a call to action.";
+    if (!b.objective.trim()) return "Add a campaign objective.";
+    if (!b.audience.trim()) return "Add a target audience.";
+    if (!b.offer.trim()) return "Add the offer.";
+    if (!b.brandVoice.trim()) return "Add the brand voice.";
+    return null;
+  }
+
   async function run() {
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      setResult(null);
+      return;
+    }
     setLoading(true);
     setError(null);
     setResult(null);
@@ -82,11 +101,23 @@ export default function ReviewPage() {
           <div className="card">
             <h2 className="card-title">Creative</h2>
             <label>Headline</label>
-            <input value={form.creative.headline} onChange={(e) => setC("headline", e.target.value)} />
+            <input
+              value={form.creative.headline}
+              onChange={(e) => setC("headline", e.target.value)}
+              placeholder="e.g. Lose 10kg in 2 weeks — guaranteed!"
+            />
             <label>Body</label>
-            <textarea value={form.creative.body} onChange={(e) => setC("body", e.target.value)} />
+            <textarea
+              value={form.creative.body}
+              onChange={(e) => setC("body", e.target.value)}
+              placeholder="The main ad copy your audience will read…"
+            />
             <label>CTA</label>
-            <input value={form.creative.cta} onChange={(e) => setC("cta", e.target.value)} />
+            <input
+              value={form.creative.cta}
+              onChange={(e) => setC("cta", e.target.value)}
+              placeholder="e.g. Buy now"
+            />
 
             <label>Ad image (optional — the agents will look at it)</label>
             {form.creative.imageUrl ? (
@@ -111,13 +142,29 @@ export default function ReviewPage() {
 
             <h2 className="card-title" style={{ marginTop: 24 }}>Brief</h2>
             <label>Objective</label>
-            <input value={form.brief.objective} onChange={(e) => setB("objective", e.target.value)} />
+            <input
+              value={form.brief.objective}
+              onChange={(e) => setB("objective", e.target.value)}
+              placeholder="e.g. Conversions"
+            />
             <label>Audience</label>
-            <input value={form.brief.audience} onChange={(e) => setB("audience", e.target.value)} />
+            <input
+              value={form.brief.audience}
+              onChange={(e) => setB("audience", e.target.value)}
+              placeholder="e.g. Women 30–45, health-conscious, EU"
+            />
             <label>Offer</label>
-            <input value={form.brief.offer} onChange={(e) => setB("offer", e.target.value)} />
+            <input
+              value={form.brief.offer}
+              onChange={(e) => setB("offer", e.target.value)}
+              placeholder="e.g. 20% off first order"
+            />
             <label>Brand voice</label>
-            <input value={form.brief.brandVoice} onChange={(e) => setB("brandVoice", e.target.value)} />
+            <input
+              value={form.brief.brandVoice}
+              onChange={(e) => setB("brandVoice", e.target.value)}
+              placeholder="e.g. Warm, science-backed, no hype"
+            />
 
             <button className="btn btn-primary" onClick={run} disabled={loading}>
               {loading ? "Agents reviewing…" : "Run AdVerdict review"}
