@@ -36,7 +36,7 @@ export default function ReviewsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/reviews");
+        const res = await fetch("/api/reviews", { cache: "no-store" });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to load reviews");
         setReviews(data.reviews || []);

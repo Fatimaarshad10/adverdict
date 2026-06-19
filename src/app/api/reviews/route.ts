@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createService } from "@/lib/supabase/service";
 
+// Always read fresh from the database — never serve a cached/stale snapshot.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const supabase = createService();
